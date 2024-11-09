@@ -1,0 +1,6 @@
+[submodule "work/RobotUE5App/Plugins/rclUE"]
+	path = work/RobotUE5App/Plugins/rclUE
+	url = https://github.com/rapyuta-robotics/rclUE
+[submodule "work/RobotUE5App/Plugins/RapyutaSimulationPlugins"]
+	path = work/RobotUE5App/Plugins/RapyutaSimulationPlugins
+	url = https://github.com/rapyuta-robotics/RapyutaSimulationPlugins.git
