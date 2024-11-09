@@ -1,0 +1,54 @@
+# Ignore user-specific files
+*.suo
+*.user
+*.userossc
+*.userprefs
+
+# Ignore project-specific cache files
+*.log
+*.vspscc
+*.vssscc
+*.pidb
+*.sdf
+*.sqlite
+*.pdb
+*.opendb
+
+# Ignore binary files
+*.exe
+*.dll
+*.obj
+*.o
+*.lib
+*.apk
+*.apk_unreal
+*.app
+*.dylib
+*.ipa
+*.dsym
+
+# Ignore intermediate files
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vscode/
+
+# Ignore Config files
+*.ini
+*.Config
+
+# Ignore Build files
+Build/Build.cs
+Build/Build.csproj
+Build/Build.exe
+Build/Build.sln
+
+# Ignore all files generated during packaging
+!Content/
+!Source/
+
+# Optional: Ignore plugins you don't want to include
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+
