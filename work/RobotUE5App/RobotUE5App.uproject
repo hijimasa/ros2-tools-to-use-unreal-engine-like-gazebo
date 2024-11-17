@@ -1,8 +1,18 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.4",
+	"EngineAssociation": "1456A52F-62A8-4129-88C5-E892731CD911",
 	"Category": "",
 	"Description": "",
+	"Modules": [
+		{
+			"Name": "RobotUE5App",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	],
 	"Plugins": [
 		{
 			"Name": "ModelingToolsEditorMode",
@@ -10,6 +20,14 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "rclUE",
+			"Enabled": true
+		},
+		{
+			"Name": "RapyutaSimulationPlugins",
+			"Enabled": true
 		}
 	]
 }

@@ -1,4 +1,5 @@
-FROM ghcr.io/epicgames/unreal-engine:dev-slim-5.4.3
+#FROM ghcr.io/epicgames/unreal-engine:dev-slim-5.4.3
+FROM ghcr.io/epicgames/unreal-engine:dev-slim-5.3.2
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -39,10 +40,12 @@ RUN sudo apt -y -qq update && sudo apt -y -qq install software-properties-common
     ros-humble-cv-bridge ros-humble-diagnostic-updater \
     ros-humble-moveit && \
   sudo apt-get install -y -qq ros-humble-xacro ros-humble-realtime-tools ros-humble-control-toolbox ros-humble-ros2-control* ros-humble-ros-testing \
-    ros-humble-teleop-twist-keyboard ros-humble-vision-msgs && \
+    ros-humble-teleop-twist-keyboard ros-humble-vision-msgs ros-humble-tf-transformations && \
   : "remove cache" && \
   sudo apt-get autoremove -y -qq && \
   sudo rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install transforms3d
   
 RUN sudo apt-get update && sudo apt-get install -q -y --no-install-recommends \
     dirmngr \
@@ -75,6 +78,40 @@ RUN sudo apt-get update && sudo apt-get install -q -y --no-install-recommends \
     ros-humble-rmw-cyclonedds-cpp \
     iproute2 \
     && sudo apt-get clean
+
+RUN sudo apt-get update
+RUN sudo apt-get install -y xz-utils
+
+# blenderのバイナリはいい感じに持ってくる
+RUN mkdir /tmp/blender \
+  && cd /tmp/blender \
+  && wget https://mirror.freedif.org/blender/release/Blender4.2/blender-4.2.1-linux-x64.tar.xz \
+  && tar -xvf "./blender-4.2.1-linux-x64.tar.xz"
+
+# blender依存関係のインストール
+RUN sudo apt-get install glibc-source -y
+RUN sudo apt-get install -y libsm6 libxext6
+RUN sudo apt-get install -y libx11-dev libxxf86vm-dev libxcursor-dev libxi-dev libxrandr-dev libxinerama-dev libegl-dev
+RUN sudo apt-get install -y libwayland-dev wayland-protocols libxkbcommon-dev libdbus-1-dev linux-libc-dev
+
+# blender本体のインストール
+ENV BLENDER_DIR="/usr/local/blender"
+ENV BLENDER_PATH="${BLENDER_DIR}/blender"
+ENV BLENDER_PYTHON_PATH="${BLENDER_DIR}/4.2/python/bin/python3.11"
+RUN sudo cp -r /tmp/blender/blender-4.2.1-linux-x64 ${BLENDER_DIR}
+ENV PATH="${BLENDER_PATH}:${PATH}"
+
+# pythonのセットアップ
+RUN ${BLENDER_PYTHON_PATH} -m ensurepip \
+  && ${BLENDER_PYTHON_PATH} -m pip install --upgrade pip \
+  && ${BLENDER_PYTHON_PATH} -m pip install pyyaml \
+  && ${BLENDER_PYTHON_PATH} -m pip install rospkg \
+  && ${BLENDER_PYTHON_PATH} -m pip install urdf_parser_py
+
+RUN cd /tmp \
+  && git clone https://github.com/HoangGiang93/urdf_importer.git \
+  && cd urdf_importer \
+  && zip -r urdf_importer_addon.zip .
 
 #RUN echo 'export FASTRTPS_DEFAULT_PROFILES_FILE=/root/colcon_ws/src/isaac_ros2_utils/isaac_ros2_scripts/config/fastdds.xml' >> ~/.bashrc
 #RUN echo 'export RMW_IMPLEMENTATION=rmw_fastrtps_cpp' >> ~/.bashrc

@@ -7,21 +7,21 @@ import subprocess
 from ament_index_python.packages import get_package_share_directory
 from os.path import expanduser
 
-def find_unity_executable(base_dir="~/Unity/Hub/Editor"):
+def find_unreal_engine_executable(base_dir="~/UnrealEngine"):
     # Expand user directory in the base path
     base_dir = os.path.expanduser(base_dir)
     
-    # Search for the Unity executable within any version folder
-    unity_executable_pattern = os.path.join(base_dir, "*/Editor/Unity")
-    unity_executables = glob.glob(unity_executable_pattern)
+    # Search for the Unreal Engine executable within any version folder
+    unreal_engine_executable_pattern = os.path.join(base_dir, "*/*/Linux/UnrealEditor")
+    unreal_engine_executables = glob.glob(unreal_engine_executable_pattern)
     
-    if unity_executables:
-        print("Unity executable(s) found:")
-        for executable in unity_executables:
+    if unreal_engine_executables:
+        print("Unreal Engine executable(s) found:")
+        for executable in unreal_engine_executables:
             print(executable)
-        return str(unity_executables[0])
+        return str(unreal_engine_executables[0])
     else:
-        print("No Unity executable found.")
+        print("No Unreal Engine executable found.")
         return None
 
 class SimLancher(Node):
@@ -29,22 +29,22 @@ class SimLancher(Node):
         super().__init__('sim_launcher')
         self.proc = None
 
-        self.declare_parameter('unity_path', '')
-        unity_path = self.get_parameter('unity_path').get_parameter_value().string_value
-        found_unity_path = find_unity_executable()
-        if (unity_path == '') and (not found_unity_path == None):
-            unity_path = found_unity_path
-        if not os.path.isfile(unity_path):
-            self.get_logger().fatal('Unity not found!!')
+        self.declare_parameter('unreal_engine_path', '')
+        unreal_engine_path = self.get_parameter('unreal_engine_path').get_parameter_value().string_value
+        found_unreal_engine_path = find_unreal_engine_executable()
+        if (unreal_engine_path == '') and (not found_unreal_engine_path == None):
+            unreal_engine_path = found_unreal_engine_path
+        if not os.path.isfile(unreal_engine_path):
+            self.get_logger().fatal('Unreal Engine not found!!')
             return
 
-        self.declare_parameter('project_path', str(os.path.expanduser("~")) + '/work/Robot_Unity_App/')
+        self.declare_parameter('project_path', str(os.path.expanduser("~")) + '/work/RobotUE5App/RobotUE5App.uproject')
         project_path = self.get_parameter('project_path').get_parameter_value().string_value
 
         self.declare_parameter('open_file_path', '')
         open_file_path = self.get_parameter('open_file_path').get_parameter_value().string_value
                 
-        command = [unity_path, "-projectPath", project_path]
+        command = [unreal_engine_path, project_path]
         if not open_file_path == '':
             command.append('-openfile')
             command.append(open_file_path)

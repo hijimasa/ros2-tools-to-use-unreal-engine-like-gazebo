@@ -4,3 +4,6 @@
 [submodule "work/RobotUE5App/Plugins/RapyutaSimulationPlugins"]
 	path = work/RobotUE5App/Plugins/RapyutaSimulationPlugins
 	url = https://github.com/rapyuta-robotics/RapyutaSimulationPlugins.git
+[submodule "colcon_ws/src/UE_msgs"]
+	path = colcon_ws/src/UE_msgs
+	url = https://github.com/rapyuta-robotics/UE_msgs.git

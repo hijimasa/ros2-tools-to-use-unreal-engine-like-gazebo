@@ -54,3 +54,11 @@
     ```
     ./launch_docker.sh
     ```
+
+## New Project Tips
+- Set "Edit -> Project Settings -> Maps&Modes -> DefaultMode -> Default GameMode" to "RRROS2GameMode"
+
+## Reference
+
+- [Dockerを使ってUnreal Engineのコンテナイメージを利用する](https://colory-games.net/site/use_unreal_engine_container_image/)
+- [GitHub で Unreal Engine のソースコードにアクセス](https://www.unrealengine.com/ja/ue-on-github)
