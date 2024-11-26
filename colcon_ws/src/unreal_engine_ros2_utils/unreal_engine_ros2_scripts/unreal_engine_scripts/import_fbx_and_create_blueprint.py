@@ -5,6 +5,21 @@ def import_fbx_and_create_blueprint(fbx_file_path, blueprint_name, wheel_bone_na
     editor_asset_lib = unreal.EditorAssetLibrary()
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
 
+    # Determine destination paths
+    destination_path = "/Game/ImportedFBX"
+    fbx_file_name = fbx_file_path.split('/')[-1].replace('.fbx', '')
+    skeletal_mesh_path = f"{destination_path}/{fbx_file_name}"
+    physics_asset_path = f"{destination_path}/{fbx_file_name}_PhysicsAsset"
+
+    # Check for and delete existing Skeletal Mesh and Physics Asset
+    if editor_asset_lib.does_asset_exist(skeletal_mesh_path):
+        unreal.log_warning(f"Skeletal Mesh already exists at {skeletal_mesh_path}, deleting...")
+        editor_asset_lib.delete_asset(skeletal_mesh_path)
+
+    if editor_asset_lib.does_asset_exist(physics_asset_path):
+        unreal.log_warning(f"Physics Asset already exists at {physics_asset_path}, deleting...")
+        editor_asset_lib.delete_asset(physics_asset_path)
+
     # Import FBX File with Skeletal Mesh enabled
     fbx_import_task = unreal.AssetImportTask()
     fbx_import_task.filename = fbx_file_path
@@ -24,13 +39,16 @@ def import_fbx_and_create_blueprint(fbx_file_path, blueprint_name, wheel_bone_na
     import_options.import_materials = True
     import_options.import_textures = True
     import_options.automated_import_should_detect_type = False
-    import_options.create_physics_asset = True  # Correct placement for create_physics_asset
+    import_options.create_physics_asset = True
 
     # Skeletal Mesh settings
     import_options.skeletal_mesh_import_data.import_mesh_lo_ds = False
+    import_options.skeletal_mesh_import_data.set_editor_property("use_t0_as_ref_pose", True)
 
     # Static Mesh-specific settings (disabled to avoid default to Static Mesh)
     import_options.static_mesh_import_data.combine_meshes = False
+    import_options.static_mesh_import_data.auto_generate_collision = True
+    import_options.static_mesh_import_data.one_convex_hull_per_ucx = False
 
     # Assign options to the task
     fbx_import_task.options = import_options
@@ -40,13 +58,19 @@ def import_fbx_and_create_blueprint(fbx_file_path, blueprint_name, wheel_bone_na
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([fbx_import_task])
 
     # Find the imported skeletal mesh
-    skeletal_mesh_path = f"{fbx_import_task.destination_path}/{fbx_file_path.split('/')[-1].replace('.fbx', '')}"
     skeletal_mesh = editor_asset_lib.load_asset(skeletal_mesh_path)
 
     if not skeletal_mesh:
         unreal.log_error(f"Failed to load Skeletal Mesh from {skeletal_mesh_path}")
         return
 
+    physics_asset = editor_asset_lib.load_asset(physics_asset_path)
+    physics_asset_data = editor_asset_lib.find_asset_data(physics_asset_path)
+
+    if not physics_asset or not physics_asset_data:
+        unreal.log_error(f"Failed to create PhysicsAsset for {skeletal_mesh.get_name()}")
+        return
+        
     # Delete existing Blueprint
     blueprint_path = "/Game/" + blueprint_name
     if editor_asset_lib.does_asset_exist(blueprint_path):
@@ -82,6 +106,12 @@ def import_fbx_and_create_blueprint(fbx_file_path, blueprint_name, wheel_bone_na
     skeletal_mesh_data = unreal.SubobjectDataBlueprintFunctionLibrary.get_data(skeletal_mesh_handle)
     skeletal_mesh_component = unreal.SubobjectDataBlueprintFunctionLibrary.get_object(skeletal_mesh_data)
     skeletal_mesh_component.set_editor_property("skeletal_mesh", skeletal_mesh)
+
+    # Apply Convex Decomposition Collision
+    skeletal_mesh_component.set_all_bodies_simulate_physics(True)
+    skeletal_mesh_component.set_simulate_physics(True)
+    skeletal_mesh_component.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
+    skeletal_mesh_component.set_collision_object_type(unreal.CollisionChannel.ECC_PHYSICS_BODY)
 
     # Add custom C++ component under SkeletalMeshComponent
     custom_component_handle, _ = subsystem.add_new_subobject(

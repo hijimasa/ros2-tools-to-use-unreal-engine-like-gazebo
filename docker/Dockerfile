@@ -71,8 +71,8 @@ RUN sudo sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.mic
 RUN sudo apt-get update && \
     sudo apt-get install -y code
 
-RUN sudo echo '#!/bin/bash\n /usr/bin/code --user-data-dir="/root/.config/Code" --no-sandbox "$@"' | sudo tee /usr/local/bin/code && \
-    sudo chmod +x /usr/local/bin/code
+#RUN sudo echo '#!/bin/bash\n /usr/bin/code --user-data-dir="/root/.config/Code" --no-sandbox "$@"' | sudo tee /usr/local/bin/code && \
+#    sudo chmod +x /usr/local/bin/code
 
 RUN sudo apt-get update && sudo apt-get install -q -y --no-install-recommends \
     ros-humble-rmw-cyclonedds-cpp \

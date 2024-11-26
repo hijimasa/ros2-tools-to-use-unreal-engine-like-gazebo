@@ -8,7 +8,7 @@ public class RobotUE5App : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "PhysicsCore", "EditorScriptingUtilities", "UnrealEd" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
